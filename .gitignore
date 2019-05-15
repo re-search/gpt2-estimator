@@ -102,3 +102,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+models/
+gpt2_train_data/
+.vscode/

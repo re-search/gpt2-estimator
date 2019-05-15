@@ -4,18 +4,17 @@ import tensorflow_estimator as tf_estimator
 import os
 import numpy as np
 
-from gpt_2.gpt2.src import model, sample, encoder
-from gpt_2.gpt2.src.mqa_load_dataset import load_dataset, Sampler
-from gpt_2.gpt2.src.accumulate import AccumulatingOptimizer
+from gpt2.src import model, sample, encoder
+from gpt2.src.mqa_load_dataset import load_dataset, Sampler
+from gpt2.src.accumulate import AccumulatingOptimizer
 
 
 @tf.function
-def accumulate_gradient(accumulated_steps, accumulate_gradients, opt_compute, opt_apply):
-    if accumulated_steps >= accumulate_gradients:
-        accumulated_steps.assign(0)
+def accumulate_gradient(global_step, accumulate_gradients, opt_compute, opt_apply):
+    accu = tf.floormod(global_step, accumulate_gradients)
+    if accu == 0:
         return opt_apply
     else:
-        accumulated_steps += 1
         return opt_compute
 
 
@@ -25,7 +24,7 @@ def reset_gradient(global_step, accumulate_gradients, opt_reset):
     if accu == 0:
         return opt_reset
     else:
-        return tf.no_op()
+        return 0.0
 
 
 def get_gpt2_model_fn(
@@ -69,24 +68,24 @@ def get_gpt2_model_fn(
                 # if apply gradient, clear gradient
                 # accu = tf.cast(tf.mod(
                 #     global_step, accumulate_gradients), tf.bool)
-                accu = tf.equal(
-                    tf.mod(global_step, accumulate_gradients), 0)
+                # accu = tf.equal(
+                #     tf.mod(global_step, accumulate_gradients), 0)
 
-                opt_apply = tf.cond(
-                    accu, true_fn=lambda: opt_apply, false_fn=lambda: opt_compute)
-                opt_reset = tf.cond(
-                    accu, true_fn=lambda: opt_reset, false_fn=lambda: 0.0
-                )
+                # opt_apply = tf.cond(
+                #     accu, true_fn=lambda: opt_apply, false_fn=lambda: opt_compute)
+                # opt_reset = tf.cond(
+                #     accu, true_fn=lambda: opt_reset, false_fn=lambda: 0.0
+                # )
 
-                # opt_apply = accumulate_gradient(
-                #     accumulated_steps, accumulate_gradients, opt_compute, opt_apply)
-                # opt_reset = reset_gradient(
-                #     accumulated_steps, accumulate_gradients, opt_reset)
+                opt_apply = accumulate_gradient(
+                    global_step, accumulate_gradients, opt_compute, opt_apply)
+                opt_reset = reset_gradient(
+                    global_step, accumulate_gradients, opt_reset)
                 update_global_step = tf.compat.v1.assign(
                     global_step, global_step + 1, name='update_global_step')
                 apply_and_reset = tf.group(
                     [opt_apply, opt_reset, update_global_step])
-                tf.compat.v1.summary.scalar('loss', loss)
+                tf.compat.v1.summary.scalar('loss', opt_apply)
             else:
                 apply_and_reset = tf.compat.v1.train.AdamOptimizer(
                     learning_rate=learning_rate).minimize(

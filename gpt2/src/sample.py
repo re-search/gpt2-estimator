@@ -1,6 +1,6 @@
 import tensorflow.compat.v1 as tf
 
-from gpt_2.gpt2.src import model
+from gpt2.src import model
 
 
 def top_k_logits(logits, k):

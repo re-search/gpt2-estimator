@@ -18,9 +18,9 @@ try:
 except:
     pass
 
-from gpt_2.gpt2.src import model, sample, encoder
-from gpt_2.gpt2.src.mqa_load_dataset import load_dataset, Sampler
-from gpt_2.gpt2.src.accumulate import AccumulatingOptimizer
+from gpt2.src import model, sample, encoder
+from gpt2.src.mqa_load_dataset import load_dataset, Sampler
+from gpt2.src.accumulate import AccumulatingOptimizer
 
 
 def download_gpt2(model_name='117M'):
