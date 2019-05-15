@@ -26,7 +26,7 @@ class AccumulatingOptimizer(object):
         updates.append(self.count_loss.assign(
             tf.zeros(shape=[], dtype=tf.float32)))
         with tf.control_dependencies(updates):
-            return 0.0
+            return tf.cast(0, tf.float32)
 
     def compute_gradients(self, loss):
         grads = self.opt.compute_gradients(
@@ -36,7 +36,7 @@ class AccumulatingOptimizer(object):
         updates.append(self.count_loss.assign_add(
             tf.constant(1.0)))
         with tf.control_dependencies(updates):
-            return 0.0
+            return tf.cast(0, tf.float32)
 
     def apply_gradients(self):
         grads = [(g, v) for (v, g) in self.accum_vars.items()]

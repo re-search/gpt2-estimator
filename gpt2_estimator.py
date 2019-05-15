@@ -12,7 +12,7 @@ from gpt2.src.accumulate import AccumulatingOptimizer
 @tf.function
 def accumulate_gradient(global_step, accumulate_gradients, opt_compute, opt_apply):
     accu = tf.floormod(global_step, accumulate_gradients)
-    if accu == 0:
+    if tf.equal(accu, 0):
         return opt_apply
     else:
         return opt_compute
@@ -21,7 +21,7 @@ def accumulate_gradient(global_step, accumulate_gradients, opt_compute, opt_appl
 @tf.function
 def reset_gradient(global_step, accumulate_gradients, opt_reset):
     accu = tf.floormod(global_step, accumulate_gradients)
-    if accu == 0:
+    if tf.equal(accu, 0):
         return opt_reset
     else:
         return 0.0
@@ -65,22 +65,11 @@ def get_gpt2_model_fn(
                 opt_apply = opt.apply_gradients()
                 opt_reset = opt.reset()
 
-                # if apply gradient, clear gradient
-                # accu = tf.cast(tf.mod(
-                #     global_step, accumulate_gradients), tf.bool)
-                # accu = tf.equal(
-                #     tf.mod(global_step, accumulate_gradients), 0)
-
-                # opt_apply = tf.cond(
-                #     accu, true_fn=lambda: opt_apply, false_fn=lambda: opt_compute)
-                # opt_reset = tf.cond(
-                #     accu, true_fn=lambda: opt_reset, false_fn=lambda: 0.0
-                # )
-
                 opt_apply = accumulate_gradient(
                     global_step, accumulate_gradients, opt_compute, opt_apply)
-                opt_reset = reset_gradient(
-                    global_step, accumulate_gradients, opt_reset)
+                with tf.compat.v1.control_dependencies([opt_apply]):
+                    opt_reset = reset_gradient(
+                        global_step, accumulate_gradients, opt_reset)
                 update_global_step = tf.compat.v1.assign(
                     global_step, global_step + 1, name='update_global_step')
                 apply_and_reset = tf.group(
