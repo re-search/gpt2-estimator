@@ -4,9 +4,9 @@ import tensorflow_estimator as tf_estimator
 import os
 import numpy as np
 
-from gpt2.src import model, sample, encoder
-from gpt2.src.mqa_load_dataset import load_dataset, Sampler
-from gpt2.src.accumulate import AccumulatingOptimizer
+from gpt2_estimator.gpt2.src import model, sample, encoder
+from gpt2_estimator.gpt2.src.mqa_load_dataset import load_dataset, Sampler
+from gpt2_estimator.gpt2.src.accumulate import AccumulatingOptimizer
 
 
 @tf.function

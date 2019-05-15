@@ -3,9 +3,6 @@ import tensorflow_estimator as tf_estimator
 import json
 import os
 
-import gpt2
-
-import ckpt_restore_hook
 import gpt2_estimator
 
 DEVICE = ["/gpu:0", "/gpu:1"]
@@ -42,7 +39,7 @@ def train_gpt2(
         temperature=0.7,
         top_k=0
     )
-    hparams = gpt2.src.model.default_hparams()
+    hparams = gpt2_estimator.default_hparams()
     with open(os.path.join(pretrained_path, 'hparams.json')) as f:
         hparams.override_from_dict(json.load(f))
     estimator = tf_estimator.estimator.Estimator(
@@ -51,7 +48,7 @@ def train_gpt2(
         params=hparams,
         config=config)
 
-    restore_hook = ckpt_restore_hook.RestoreCheckpointHook(pretrained_path)
+    restore_hook = gpt2_estimator.RestoreCheckpointHook(pretrained_path)
     estimator.train(
         lambda: gpt2_estimator.train_input_fn(batch_size=batch_size), max_steps=steps, hooks=[restore_hook])
 
