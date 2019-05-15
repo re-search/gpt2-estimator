@@ -1,0 +1,8 @@
+pandas
+numpy
+requests
+regex
+tqdm
+protobuf
+tensorflow_estimator
+tensorflow_gpu==2.0.0a0
