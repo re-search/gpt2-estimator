@@ -1,14 +1,14 @@
-# gpt2-estimator
+# GPT2-Estimator
 
 ## What is this project?
 
-An implementation of GPT2 using tf.estimator API with multiple GPU training supports.
+An implementation of GPT2 using THE tf.estimator API. Now GPT2 can be training using Multiple GPUs!
 
 ## Why would I need this?
 
-- Easier training and inferce
-- Multiple GPU supports
-- All goodies that tf.estimator provide
+- Easier training and infernce
+- Train on multiple GPUs
+- All the goodies that tf.estimator provide
 - TF 2.0 compatible
 
 Reference: 
