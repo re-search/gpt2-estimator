@@ -2,7 +2,7 @@
 
 ## What is this project?
 
-An implementation of GPT2 using THE tf.estimator API. Now GPT2 can be training using Multiple GPUs!
+An implementation of GPT2 using the tf.estimator API. Now GPT2 can be training using Multiple GPUs!
 
 ## Why would I need this?
 
