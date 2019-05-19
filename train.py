@@ -7,8 +7,6 @@ import gpt2_estimator
 
 DEVICE = ["/gpu:0", "/gpu:1"]
 
-tf.compat.v1.disable_eager_execution()
-
 
 def train_gpt2(
         model_dir='models/gpt2',
@@ -17,6 +15,7 @@ def train_gpt2(
         batch_size=2,
         num_gpu=1,
         learning_rate=0.0001):
+    tf.compat.v1.disable_eager_execution()
     tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.DEBUG)
 
     mirrored_strategy = tf.distribute.MirroredStrategy(
