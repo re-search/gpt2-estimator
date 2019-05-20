@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 from gpt2_estimator.gpt2.src import model, sample, encoder
-from gpt2_estimator.gpt2.src.mqa_load_dataset import load_dataset, Sampler
+from gpt2_estimator.gpt2.src.load_dataset import load_dataset, Sampler
 from gpt2_estimator.gpt2.src.accumulate import AccumulatingOptimizer
 
 
@@ -102,10 +102,10 @@ def get_gpt2_model_fn(
     return model_fn
 
 
-def train_input_fn(checkpoint_path='models/117M', data_path='gpt2_train_data/bertffn_crossentropy_gpt2_train_data.zip', combine=50000, batch_size=8, max_seq_len=512):
+def train_input_fn(checkpoint_path='models/117M', data_path='gpt2_train_data/bertffn_crossentropy_gpt2_train_data.zip', combine=50000, batch_size=8, max_seq_len=512, dataset_load_fn=load_dataset, sampler=Sampler):
     enc = encoder.get_encoder(checkpoint_path)
-    chunks = load_dataset(enc, data_path, combine)
-    data_sampler = Sampler(chunks)
+    chunks = dataset_load_fn(enc, data_path, combine)
+    data_sampler = sampler(chunks)
 
     def sample_batch():
         while True:
