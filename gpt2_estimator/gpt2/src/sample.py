@@ -30,6 +30,9 @@ def sample_sequence(*, hparams, length, start_token=None, batch_size=None, conte
         assert context is None, 'Specify exactly one of start_token and context!'
         context = tf.fill([batch_size, 1], start_token)
 
+    # get length of prefix
+    prefix_len = tf.shape(context)[-1]
+
     def step(hparams, tokens, past=None):
         lm_output = model.model(
             hparams=hparams, X=tokens, past=past, reuse=tf.AUTO_REUSE)
@@ -64,22 +67,24 @@ def sample_sequence(*, hparams, length, start_token=None, batch_size=None, conte
 
         def cond(*args):
             return True
+        with tf.control_dependencies([prefix_len]):
+            _, _, tokens = tf.while_loop(
+                cond=cond, body=body,
+                maximum_iterations=length,
+                loop_vars=[
+                    context_output['presents'],
+                    context[:, -1],
+                    context,
+                ],
+                shape_invariants=[
+                    tf.TensorShape(model.past_shape(
+                        hparams=hparams, batch_size=batch_size)),
+                    tf.TensorShape([batch_size]),
+                    tf.TensorShape([batch_size, None]),
+                ],
+                back_prop=False,
+            )
 
-        _, _, tokens = tf.while_loop(
-            cond=cond, body=body,
-            maximum_iterations=length,
-            loop_vars=[
-                context_output['presents'],
-                context[:, -1],
-                context,
-            ],
-            shape_invariants=[
-                tf.TensorShape(model.past_shape(
-                    hparams=hparams, batch_size=batch_size)),
-                tf.TensorShape([batch_size]),
-                tf.TensorShape([batch_size, None]),
-            ],
-            back_prop=False,
-        )
+        tokens = tokens[:, prefix_len:]
 
         return tokens
