@@ -135,6 +135,7 @@ def train_input_fn(checkpoint_path='models/117M', data_path='gpt2_train_data/ber
 
     dataset = tf.data.Dataset.from_generator(
         sample_batch, output_types=output_type, output_shapes=output_shape)
+    dataset = dataset.prefetch(100)
     return dataset
 
 

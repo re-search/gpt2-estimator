@@ -10,7 +10,7 @@ class AccumulatingOptimizer(object):
     def __init__(self, opt, var_list):
         self.opt = opt
         self.var_list = var_list
-        self.aggregation = tf.VariableAggregation.SUM
+        self.aggregation = tf.VariableAggregation.MEAN
         self.accum_vars = {tv: tf.Variable(tf.zeros_like(tv.initialized_value()), trainable=False, aggregation=self.aggregation, name='accum_var{0}'.format(tv_ind))
                            for tv_ind, tv in enumerate(var_list)}
         self.total_loss = tf.Variable(
