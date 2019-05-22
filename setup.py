@@ -24,7 +24,6 @@ setup(
     python_requires='>=3.5.0',
     install_requires=install_requires,
     classifiers=(
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
