@@ -4,4 +4,4 @@ requests
 regex
 tqdm
 protobuf
-tensorflow_gpu==2.0.0a0
+tensorflow_gpu==2.0.0
